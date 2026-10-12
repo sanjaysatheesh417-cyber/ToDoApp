@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 
 app = FastAPI(
-    title = "Blog",
-    description = "a starter app"
+    title = "ToDoApp",
+    description = "an app built to store your to do"
 )
+
+
