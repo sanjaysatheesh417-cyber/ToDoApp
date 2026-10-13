@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+
+RUN pip install --no-cache-dir uv \
+    && uv sync --frozen --no-dev --no-install-project
+
+COPY . .
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+EXPOSE 8006
+
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "main:app"]
