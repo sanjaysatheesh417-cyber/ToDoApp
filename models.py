@@ -10,5 +10,6 @@ class Task(Base):
     task = Column(String, nullable=False)
     added_on = Column(DateTime, default=datetime.utcnow, nullable=False)
     edited_on = Column(DateTime, default=datetime.utcnow)
-    deadline = Column(DateTime, nullable = False)
+    time = Column(DateTime, nullable = False)
+    importance = Column(Enum("High","Moderate","Low"), nullable= False)
     
