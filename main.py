@@ -1,11 +1,18 @@
 from fastapi import FastAPI
 
-app = FastAPI(
-    title = "ToDoApp",
-    description = "an app built to store your to do"
-)
-
 from db import Base, engine
 import models
+from contextlib import asynccontextmanager
+from sqlalchemy import text
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app):
+    with engine.begin() as conn:
+        conn.execute(text("SELECT pg_advisory_xact_lock(724001)"))
+        Base.metadata.create_all(bind=conn)
+    yield
+
+app = FastAPI(
+    title = "ToDoApp",
+    lifespan=lifespan
+)
