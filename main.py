@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+import router
 from db import Base, engine
 import models
 from contextlib import asynccontextmanager
@@ -16,3 +16,5 @@ app = FastAPI(
     title = "ToDoApp",
     lifespan=lifespan
 )
+
+app.include_router(router.router)
