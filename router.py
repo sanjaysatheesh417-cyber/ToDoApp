@@ -1,7 +1,7 @@
 import asyncio
 import time
 from fastapi import APIRouter, Depends, HTTPException, Request, status, BackgroundTasks, Query
-
+from typing import Literal
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 import models, schemas
@@ -48,8 +48,12 @@ def list_tasks(
     status: models.TaskStatus | None = None,
     importance: models.Priority | None = None,
     search: str | None = None,
+    sort_by: Literal["time","added_on","importance"] = "time",
+    order: Literal["asc", "desc"] = "asc",
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     db:Session=Depends(get_db)):
-    return service.get_all_tasks(db, status, importance, search)
+    return service.get_all_tasks(db, status, importance, search, sort_by, order, limit, offset)
 
 @router.get("/tasks/{task_id}", response_model=schemas.TaskOut)
 def show_task(

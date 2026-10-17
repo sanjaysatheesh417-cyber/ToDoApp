@@ -31,7 +31,11 @@ def get_all_tasks(
         db: Session,
         status: models.TaskStatus | None = None,
         importance: models.Priority | None = None,
-        search: str | None = None) -> list[models.Task]:
+        search: str | None = None,
+        sort_by: str = "time",
+        order: str = "asc",
+        limit: int = 20,
+        offset: int = 0) -> list[models.Task]:
     query = db.query(models.Task)
     if status is not None:
         query = query.filter(models.Task.status == status)
@@ -39,7 +43,17 @@ def get_all_tasks(
         query = query.filter(models.Task.importance == importance)
     if search is not None:
         query = query.filter(models.Task.task.ilike(f"%{search}%"))
-    return query.order_by(models.Task.time).all()
+    sort_columns = {
+        "time": models.Task.time,
+        "added_on": models.Task.added_on,
+        "importance": models.Task.importance
+    }
+    column = sort_columns[sort_by]
+    if order == "desc":
+        column = column.desc()
+    else:
+        column = column.asc()
+    return query.order_by(column, models.Task.id).offset(offset).limit(limit).all()
 
 def delete_task(db: Session, task_id: int) -> bool:
     db_task = db.get(models.Task, task_id)
