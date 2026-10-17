@@ -20,6 +20,18 @@ async def new_task(
     task = service.create_task(request,db)
     return task
 
+@router.get("/tasks/overdue", response_model=list[schemas.TaskOut])
+def overdue(
+    db:Session = Depends(get_db)
+):
+    return service.get_overdue_tasks(db)
+
+@router.get("/tasks/upcoming",response_model=list[schemas.TaskOut])
+def upcoming(
+    db: Session = Depends(get_db)
+):
+    return service.get_upcoming_tasks(db)
+
 @router.patch("/tasks/{task_id}",response_model=schemas.TaskOut, status_code=status.HTTP_200_OK)
 async def edit_task(
     task_id: int,
@@ -35,5 +47,30 @@ async def edit_task(
 def list_tasks(
     status: models.TaskStatus | None = None,
     importance: models.Priority | None = None,
+    search: str | None = None,
     db:Session=Depends(get_db)):
-    return service.get_all_tasks(db, status, importance)
+    return service.get_all_tasks(db, status, importance, search)
+
+@router.get("/tasks/{task_id}", response_model=schemas.TaskOut)
+def show_task(
+    task_id: int,
+    db: Session=Depends(get_db)
+):
+    db_task = db.get(models.Task, task_id)
+    return db_task
+
+@router.patch("/tasks/{task_id}/complete", response_model = schemas.TaskOut)
+def get_completed_tasks(
+    task_id: int,
+    db: Session=Depends(get_db)
+):
+    task = service.complete_task(db, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task No Found")
+    return task
+
+@router.delete("/tasks/{task_id}",status_code=status.HTTP_204_NO_CONTENT)
+def remove_task(task_id: int, db: Session = Depends(get_db)):
+    deleted = service.delete_task(db, task_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Task Not Found")
