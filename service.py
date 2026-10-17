@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import models, schemas
 
 def create_task(request: schemas.TaskCreate, db:Session):
@@ -80,3 +81,40 @@ def get_overdue_tasks(db: Session) -> list[models.Task]:
 def get_upcoming_tasks(db:Session) -> list[models.Task]:
     return db.query(models.Task).filter(models.Task.status == models.TaskStatus.pending).filter(models.Task.time > datetime.now(timezone.utc)).order_by(models.Task.time).all()
     
+def delete_completed_tasks(
+        db: Session,
+        status: models.TaskStatus,
+) -> int:
+    count = (db.query(models.Task).filter(models.Task.status == status).delete(synchronize_session=False))
+    db.commit()
+    return count
+
+def get_status(db: Session) -> dict[str,int]:
+    rows = (
+        db.query(models.Task.status, func.count(models.Task.id)).group_by(models.Task.status).all()
+    )
+
+    stats = {s.value: 0 for s in models.TaskStatus}
+    for status, count in rows:
+        stats[status.value] = count
+
+    stats["overdue"] = db.query(func.count(models.Task.id)).filter(models.Task.status == models.TaskStatus.pending).filter(models.Task.time < datetime.now(timezone.utc))
+    return stats
+
+def duplicate_task(db: Session, task_id:int ) -> models.Task | None:
+    original = db.get(models.Task, task_id)
+
+    if original is None:
+        return None
+
+    copy = models.Task(
+        task = original.task,
+        time = original.time,
+        importance = original.importance,
+        status = models.TaskStatus.pending
+    )
+
+    db.add(copy)
+    db.commit()
+    db.refresh(copy)
+    return copy
