@@ -15,6 +15,23 @@ function toLocalInput(iso) {
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function buildQuery() {
+    const params = new URLSearchParams({limit:"100"});
+    const status = document.getElementById("filter-status").value;
+    const importance = document.getElementById("filter-importance").value;
+    const search = document.getElementById("search-input").value.trim()
+    if (status) {
+        params.set("status".status);
+    }
+    if (importance){
+        params.set("importance",importance)
+    }
+    if (search) {
+        params.set("search",search);
+    }
+    return params.toString()
+}
+
 async function loadTasks() {
     const res = await fetch(`${API}/tasks`);
     if (!res.ok) {
@@ -23,6 +40,14 @@ async function loadTasks() {
     }
     const tasks = await res.json();
     renderTasks(tasks);
+    loadStats();
+}
+
+async function loadStats() {
+    const res = await fetch(`${API}/tasks/stats`);
+    if (!res.ok) return;
+    const s = await res.json();
+    document.getElementById("stats").textContent = `Pending: ${s.pending} | Completed: ${s.completed} | Overdue: $(s.overdue)`;
 }
 
 function renderTasks(tasks) {
