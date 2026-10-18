@@ -21,3 +21,31 @@ function renderTasks(tasks) {
 }
 
 loadTasks();
+
+const form = document.getElementById("task-form");
+
+form.addEventListener("submit", async (event)=>{
+    event.preventDefault();
+
+    const body = {
+        task: document.getElementById("task-input").value,
+        time: new Date(document.getElementById("time-input").value).toISOString(),
+        importance: document.getElementById("importance-input").value
+    };
+
+    const res = await fetch(`${API}/tasks`, {
+    method: "POST",
+    headers: {"Content-type": "application/json"},
+    body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+        const err = await res.json();
+        console.error("Failed to add task", res.status, err);
+        alert("Could not add the task. Check the console for details.");
+        return;
+    }
+    form.reset();
+    loadTasks();
+});
+

@@ -8,7 +8,16 @@
 </head>
 <body>
     <h1>My Tasks</h1>
-    <input id="input-el" type="text"></input>
+    <form id="task-form">
+        <input type="text" id="task-input" placeholder="what needs to be done?" required maxlength="255">
+        <input type="datetime-local" id="time-input" required>
+        <select id="importance-input">
+            <option value="high">High</option>
+            <option value="moderate">Moderate</option>
+            <option value="low">Low</option>
+        </select>
+        <button type="sumbit">Add Task</button>
+    </form>
     <ul id="task-list"></ul>
     <script src="app.js"></script>
 </body>
