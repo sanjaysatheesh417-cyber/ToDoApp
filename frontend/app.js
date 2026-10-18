@@ -15,7 +15,22 @@ function renderTasks(tasks) {
     list.innerHTML = "";
     for (const i of tasks) {
        const li = document.createElement("li");
-       li.textContent = `${i.task} | ${i.importance} | ${i.status} | ${new Date(i.time).toLocaleString()}`;
+       const text = document.createElement("span");
+       text.textContent = `${i.task} | ${i.importance} | ${i.status} | ${new Date(i.time).toLocaleString()}`;
+       li.appendChild(text);
+
+       if (i.status === "pending"){
+        const doneBtn = document.createElement("button");
+        doneBtn.textContent = "Complete";
+        doneBtn.addEventListener("click", ()=>completeTask(i.id));
+        li.appendChild(doneBtn)
+       }
+
+       const delBtn = document.createElement("button");
+       delBtn.textContent = "Delete";
+       delBtn.addEventListener("click", ()=>deleteTask(i.id));
+       li.appendChild(delBtn);
+
        list.appendChild(li);
     }
 }
@@ -49,3 +64,21 @@ form.addEventListener("submit", async (event)=>{
     loadTasks();
 });
 
+async function completeTask(id) {
+    const res = await fetch(`${API}/tasks/${id}/complete`, {method:"PATCH"});
+    if (!res.ok) {
+        console.error("Failed to complete task", res.status);
+        return;
+    }
+    loadTasks();
+}
+
+async function deleteTask(id) {
+    if (!confirm("Delete this task?")) return;
+    const res = await fetch(`${API}/tasks/${id}`, {method: "DELETE"});
+    if (res.status !== 204) {
+        console.error("Failed to delete task", res.status);
+        return;
+    }
+    loadTasks();
+}
