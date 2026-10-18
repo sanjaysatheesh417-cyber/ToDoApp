@@ -1,4 +1,19 @@
 const API = "http://localhost:8006/ToDoApp";
+let editingId = null;
+
+const form = document.getElementById("task-form");
+const subitBtn = document.getElementById("submit-btn");
+const cancelBtn = document.getElementById("cancel-btn");
+
+function parseTime(iso){
+    return new Date(/[Zz]|[+-]\d\d:\d\d$/.test(iso)?iso:iso+"Z");
+}
+
+function toLocalInput(iso) {
+    const d = parseTime(iso);
+    const pad = (n) => String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 async function loadTasks() {
     const res = await fetch(`${API}/tasks`);
@@ -36,8 +51,6 @@ function renderTasks(tasks) {
 }
 
 loadTasks();
-
-const form = document.getElementById("task-form");
 
 form.addEventListener("submit", async (event)=>{
     event.preventDefault();
