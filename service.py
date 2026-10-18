@@ -89,7 +89,7 @@ def delete_completed_tasks(
     db.commit()
     return count
 
-def get_status(db: Session) -> dict[str,int]:
+def get_stats(db: Session) -> dict[str,int]:
     rows = (
         db.query(models.Task.status, func.count(models.Task.id)).group_by(models.Task.status).all()
     )
@@ -98,7 +98,7 @@ def get_status(db: Session) -> dict[str,int]:
     for status, count in rows:
         stats[status.value] = count
 
-    stats["overdue"] = db.query(func.count(models.Task.id)).filter(models.Task.status == models.TaskStatus.pending).filter(models.Task.time < datetime.now(timezone.utc))
+    stats["overdue"] = db.query(func.count(models.Task.id)).filter(models.Task.status == models.TaskStatus.pending).filter(models.Task.time < datetime.now(timezone.utc)).scalar()
     return stats
 
 def duplicate_task(db: Session, task_id:int ) -> models.Task | None:
