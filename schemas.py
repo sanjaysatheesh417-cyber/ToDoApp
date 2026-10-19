@@ -31,10 +31,10 @@ class TaskOut(BaseModel):
     edited_on: datetime | None = None
 
 class TaskUpdate(BaseModel):
-    task: str
-    time: datetime
-    importance: Priority
-    status: TaskStatus
+    task: str | None = None
+    time: datetime | None = None
+    importance: Priority | None = None 
+    status: TaskStatus | None = None
 
     @field_validator('task')
     @classmethod

@@ -7,32 +7,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>My Tasks</h1>
-    <form id="task-form">
-        <input type="text" id="task-input" placeholder="what needs to be done?" required maxlength="255">
-        <input type="datetime-local" id="time-input" required>
-        <select id="importance-input">
-            <option value="high">High</option>
-            <option value="moderate">Moderate</option>
-            <option value="low">Low</option>
-        </select>
-        <button type="sumbit">Add Task</button>
-    </form>
-    <div class="filters">
-        <select id="filter-status">
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-        </select>
-        <select id="filter-importance">
-            <option value="">All importance</option>
-            <option value="high">High</option>
-            <option value="moderate">Moderate</option>
-            <option value="low">Low</option>
-        </select>
-        <input type="search" id="search-input" placeholder="Search tasks....">
-    </div>
-    <ul id="task-list"></ul>
+    <main class="app">
+        <h1>My Tasks</h1>
+        <div id="stats"></div>
+        <form id="task-form">
+            <input type="text" id="task-input" placeholder="what needs to be done?" required maxlength="255">
+            <input type="datetime-local" id="time-input" required>
+            <select id="importance-input">
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+            </select>
+            <button type="sumbit" id = "submit-btn">Add Task</button>
+            <button type="button" id = "cancel-btn" hidden>Cancel</button>
+        </form>
+        <div class="filters">
+            <select id="filter-status">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+            <select id="filter-importance">
+                <option value="">All importance</option>
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+            </select>
+            <input type="search" id="search-input" placeholder="Search tasks....">
+        </div>
+        <ul id="task-list"></ul>
+    </main>
     <script src="app.js"></script>
 </body>
 </html>
