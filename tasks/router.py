@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status, Backgrou
 from typing import Literal
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
-import models, schemas
+import tasks.models as models, tasks.schemas as schemas
 
 from db import get_db
 
-import service, schemas ,models
+import tasks.service as service, tasks.schemas as schemas ,tasks.models as models
 
 router = APIRouter(tags=["ToDoApp"], prefix="/ToDoApp")
 

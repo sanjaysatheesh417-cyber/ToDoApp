@@ -2,7 +2,7 @@ from pydantic import BaseModel, field_validator, ConfigDict
 from typing import Optional
 from datetime import datetime
 import enum
-from models import Priority, TaskStatus
+from tasks.models import Priority, TaskStatus
 
 class TaskCreate(BaseModel):
     task: str

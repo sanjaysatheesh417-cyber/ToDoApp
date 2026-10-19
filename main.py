@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import router
+import tasks.router as router
 from db import Base, engine
-import models
+import tasks.models as models
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 

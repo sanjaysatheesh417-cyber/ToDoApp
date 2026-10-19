@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-import models, schemas
+import tasks.models as models, tasks.schemas as schemas
 
 def create_task(request: schemas.TaskCreate, db:Session):
     new_task = models.Task(
