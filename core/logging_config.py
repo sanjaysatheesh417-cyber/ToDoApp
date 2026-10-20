@@ -29,5 +29,5 @@ def setup_logging(level: str = "INFO", json_format: bool = False) -> None:
     )
     root = logging.getLogger()
     root.handlers.clear()
-    root.handlers.clear(handler)
+    root.addHandler(handler)
     root.setLevel(level)

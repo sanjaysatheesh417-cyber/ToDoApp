@@ -1,23 +1,29 @@
 from pydantic import BaseModel, field_validator, ConfigDict
-from typing import Optional
 from datetime import datetime
-import enum
 from tasks.models import Priority, TaskStatus
 
+def clean_task(v: str| None)->str|None:
+    if v is None:
+        return v
+    v = v.strip()
+    if not v:
+        raise ValueError("task cannot be empty")
+    if len(v) > 255:
+        raise ValueError("task is too long, please limit it to 255 characters")
+    return v
 class TaskCreate(BaseModel):
     task: str
     time: datetime
     importance: Priority = Priority.moderate
-    status: TaskStatus = TaskStatus.pending
 
-    @field_validator('task')
-    @classmethod
-    def validate_task(cls, v:str) -> str:
-        if not v or len(v.strip()) == 0:
-            raise ValueError("task cannot be empty")
-        if len(v) > 255:
-            raise ValueError("task is too long, please limit to 255 characters!!")
-        return v
+    check_task = field_validator("task")(clean_task)
+class TaskUpdate(BaseModel):
+    task: str | None = None
+    time: datetime | None = None
+    importance: Priority | None = None 
+    status: TaskStatus | None = None
+
+    check_task = field_validator("task")(clean_task)
 
 class TaskOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -29,18 +35,3 @@ class TaskOut(BaseModel):
     status: TaskStatus
     added_on: datetime
     edited_on: datetime | None = None
-
-class TaskUpdate(BaseModel):
-    task: str | None = None
-    time: datetime | None = None
-    importance: Priority | None = None 
-    status: TaskStatus | None = None
-
-    @field_validator('task')
-    @classmethod
-    def validate_task(cls, v:str) -> str:
-        if not v or len(v.strip()) == 0:
-            raise ValueError("task cannot be empty")
-        if len(v) > 255:
-            raise ValueError("task is too long, please limit to 255 characters!!")
-        return v

@@ -1,8 +1,11 @@
-from pydantic import BaseModel, field_validator
-from typing import Optional
+from pydantic import BaseModel, field_validator, Field
 from datetime import datetime, timezone
 import re
 
+USERNAME_RE = re.compile(r"^[a-z0-9_.-]{3,32}$")
+
+def clean_username(v: str) -> str:
+    return v.strip().lower()
 class UserCreate(BaseModel):
     username: str
     password: str
@@ -10,12 +13,11 @@ class UserCreate(BaseModel):
     @field_validator("username")
     @classmethod
     def validate_username(cls, v: str) -> str:
-        if not v or len(v.strip()) == 0:
-            raise ValueError("name cannot be empty")
-        if len(v) > 255:
-            raise ValueError("name too long ,can be within 255 characters")
-        return v.strip()
-
+        v = clean_username(v)
+        if not USERNAME_RE.fullmatch(v):
+            raise ValueError("Username must be 3-32 characters: letters, digits, _ . -")
+        return v
+    
     @field_validator("password")
     @classmethod
     def validate_password(cls, v:str) -> str:
@@ -23,22 +25,28 @@ class UserCreate(BaseModel):
         if len(v) < 10:
             problems.append(f"Must be atleast 10 character long!!")
         if len(v) > 128:
-            problems.append(f"Must be at most 126 characters long!!")
+            problems.append(f"Must be at most 128 characters long!!")
         if v.strip != v:
             problems.append("Must not start or end with a space!!")
         if re.fullmatch(r"/d+",v):
             problems.append("must not contain only digits")
         if problems:
             raise ValueError(" ".join(problems))
-        return v.strip()
+        return v
 
-class LoginRequet(BaseModel):
+class LoginRequest(BaseModel):
     username: str
-    password: str
+    password: str = Field(max_length=128)
+
+    @field_validator("username")
+    @classmethod
+    def normalize(cls, v:str) -> str:
+        return clean_username(v)
 
 class TokenResponse(BaseModel):
-    token: str
-    expires_in: int = 86400
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
 
 class ShowUser(BaseModel):
     id: int
