@@ -4,7 +4,8 @@ from sqlalchemy.orm import declarative_base
 from core.config import settings
 
 engine = create_engine(
-    settings.DATABASE_URL
+    settings.DATABASE_URL,
+    pool_pre_ping=True
 )
 
 SessionLocal = sessionmaker(bind = engine, autocommit=False, autoflush=False)
@@ -21,11 +22,10 @@ def get_db():
     finally:
         db.close()
 
-def health_check():
+def health_check() -> bool:
     try:
-        db = SessionLocal()
-        db.execute(text("SELECT 1"))
-        db.close()
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
         return True
     except Exception:
         return False
