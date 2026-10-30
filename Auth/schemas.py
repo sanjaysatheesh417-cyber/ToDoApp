@@ -26,9 +26,9 @@ class UserCreate(BaseModel):
             problems.append(f"Must be atleast 10 character long!!")
         if len(v) > 128:
             problems.append(f"Must be at most 128 characters long!!")
-        if v.strip != v:
+        if v.strip() != v:
             problems.append("Must not start or end with a space!!")
-        if re.fullmatch(r"/d+",v):
+        if re.fullmatch(r"\d+",v):
             problems.append("must not contain only digits")
         if problems:
             raise ValueError(" ".join(problems))
