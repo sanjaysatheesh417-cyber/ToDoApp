@@ -1,9 +1,19 @@
-const API = "http://localhost:8006/ToDoApp";
+const API_BASE = "http://localhost:8006";
+const API = `${API_BASE}/ToDoApp`;
+const TOKEN_KEY = "todo_access_token";
+
 let editingId = null;
 
+const authForm = document.getElementById("auth-form");
+const authSection = document.getElementById("auth-section");
+const tasksSection = document.getElementById("tasks-section");
+const authMessage = document.getElementById("auth-message");
 const form = document.getElementById("task-form");
 const submitBtn = document.getElementById("submit-btn");
 const cancelBtn = document.getElementById("cancel-btn");
+
+let isRegistering = false;
+let accessToken = sessionStorage.getItem(TOKEN_KEY);
 
 function parseTime(iso){
     return new Date(/[zZ]|[+-]\d\d:\d\d$/.test(iso)?iso:iso+"Z");
@@ -14,6 +24,64 @@ function toLocalInput(iso) {
     const pad = (n) => String(n).padStart(2,"0");
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+function setAuthMessage(message) {
+    authMessage.textContent = message;
+}
+
+function showTasks() {
+    authSection.hidden = true;
+    tasksSection.hidden = false;
+    loadTasks();
+    loadStats();
+}
+
+async function apiFetch(url, options = {}) {
+    const headers = {
+        ...options.headers,
+        Authorisation: `Bearer ${accessToken}`,
+    };
+    return fetch(url, {...options, headers});
+}
+
+authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById("username-input").value.trim();
+    const password = document.getElementById("password-input").value;
+
+    const endpoint = isRegistering
+    ?  `${API_BASE}/Auth/register`
+    :  `${API_BASE}/Auth/login`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({username, password}),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.detail || "Request failed");
+        }
+
+        if (isRegistering) {
+            isRegistering = false;
+            document.getElementById("auth-title").textContent = "Sign in";
+            document.getElementById("toggle-auth").textContent = "Create account instead";
+            setAuthMessage("Account Created. Please sign in.");
+            return;
+        }
+        accessToken = result.access_token;
+        sessionStorage.setItem(TOKEN_KEY, accessToken);
+        setAuthMessage("");
+        showTasks();
+    } catch (error) {
+        setAuthMessage(error.message);
+    }
+});
 
 function buildQuery() {
     const params = new URLSearchParams({limit:"100"});
