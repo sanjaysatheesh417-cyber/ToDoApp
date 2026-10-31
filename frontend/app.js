@@ -191,7 +191,7 @@ function renderTasks(tasks) {
        const meta = document.createElement("div");
        meta.className = "task-meta";
        const imp = document.createElement("span");
-       meta.className = `badge badge-${i.importance}`;
+       imp.className = `badge badge-${i.importance}`;
        imp.textContent = i.importance;
 
        const due = document.createElement("span");

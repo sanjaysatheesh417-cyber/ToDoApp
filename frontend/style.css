@@ -1,0 +1,170 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-image: url("images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #263247;
+    font-family: Arial, sans-serif;
+}
+
+.app {
+    width: min(900px, 92%);
+    margin: 40px auto;
+}
+
+#auth-section,
+#tasks-section {
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #e1e7ef;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px #26324712;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+h1, h2 {
+    margin-top:0;
+}
+
+h1, h2, .task-tools label , #stats{
+    color:#324273;
+}
+
+input, select, button {
+    min-height: 40px;
+    padding: 8px 11px;
+    border: 1px solid #ccd5e2;
+    border-radius: 7px;
+    font: inherit;
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid #9ab2ff;
+    border-color: #496fe0;
+}
+
+button {
+    color: white;
+    background: #324273;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3659c7;
+}
+
+#task-form, .filters, .task-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+#task-input {
+    flex:1 1 220px;
+}
+
+#search-input {
+    flex:1 1 180px;
+}
+
+#task-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#task-list > li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #e1e7ef;
+    border-radius: 10px;
+}
+
+.task-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-title {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.badge {
+    padding: 4px 8px;
+    color: #6b5310;
+    background: #fff1c9;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+}
+
+.badge-high {
+    color: #a43a3a;
+    background: #ffebeb;
+}
+
+.badge.low {
+    color: #286749;
+    background: #e5f7ed;
+}
+
+.empty {
+    color: #718096;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .app {
+        margin: 16px auto;
+    }
+    #auth-section,
+    #tasks-section {
+        padding: 18px;
+    }
+
+    #task-list > li {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+
+
+
