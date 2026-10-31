@@ -81,6 +81,7 @@ class Settings(BaseSettings):
                 host=self.POSTGRES_SERVER,
                 port=self.POSTGRES_PORT,
                 database=self.POSTGRES_DB,
+                query={"sslmode": "require"} if self.ENVIRONMENT == "production" else {},
             )
             self.DATABASE_URL = local_url.render_as_string(hide_password=False)
             return self
