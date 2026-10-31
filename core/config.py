@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.engine import URL, make_url
+from sqlalchemy.engine import make_url
 from pydantic import field_validator, model_validator
 from typing import Literal
 from sqlalchemy.engine import URL
