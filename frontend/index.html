@@ -61,6 +61,32 @@
                 </select>
                 <input type="search" id="search-input" placeholder="Search tasks....">
             </div>
+            <div class="task-tools">
+                <label>
+                    View
+                    <select id="task-view">
+                        <option value="all">All tasks</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="upcoming">Upcoming</option>
+                    </select>
+                </label>
+
+                <label id="upcoming-control" hidden>
+                    Due within how many days?
+                    <input id="upcoming-days" type="number" min="1" max="365" value="7">
+                </label>
+            </div>
+
+            <div class="task-tools">
+                <label>
+                    Clear tasks with Status
+                    <select id="clear-status">
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </label>
+                <button id="clear-tasks-btn" type="button">Clear these Tasks</button>
+            </div>
             <ul id="task-list"></ul>
         </section>
     </main>

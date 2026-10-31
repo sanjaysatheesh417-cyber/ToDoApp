@@ -11,6 +11,11 @@ const authMessage = document.getElementById("auth-message");
 const form = document.getElementById("task-form");
 const submitBtn = document.getElementById("submit-btn");
 const cancelBtn = document.getElementById("cancel-btn");
+const taskView = document.getElementById("task-view");
+const upcomingControl = document.getElementById("upcoming-control");
+const upcomingDays = document.getElementById("upcoming-days");
+const clearStatus = document.getElementById("clear-status");
+const clearTasksBtn = document.getElementById("clear-tasks-btn");
 
 let isRegistering = false;
 let accessToken = sessionStorage.getItem(TOKEN_KEY);
@@ -37,11 +42,22 @@ function showTasks() {
 }
 
 async function apiFetch(url, options = {}) {
-    const headers = {
-        ...options.headers,
-        Authorization: `Bearer ${accessToken}`,
-    };
-    return fetch(url, {...options, headers});
+    if (!accessToken) {
+        throw new Error("No access token. Please sign in again.");
+    }
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", `Bearer ${accessToken}`);
+
+    const response = await fetch(url, {...options, headers});
+
+    if (response.status === 401) {
+        accessToken = null;
+        sessionStorage.removeItem(TOKEN_KEY);
+        tasksSection.hidden = true;
+        authSection.hidden = false;
+        setAuthMessage("Your session expired. Please sign in again.");
+    }
+    return response;
 }
 
 authForm.addEventListener("submit", async (event) => {
@@ -111,14 +127,30 @@ function buildQuery() {
 }
 
 async function loadTasks() {
-    const res = await apiFetch(`${API}/tasks?${buildQuery()}`);
+    let url;
+
+    if (taskView.value === "overdue") {
+        url =  `${API}/tasks/overdue`;
+    } else if(taskView.value === "upcoming") {
+        url =  `${API}/tasks/upcoming?days=${upcomingDays.value}`
+    } else {
+        url = `${API}/tasks?${buildQuery()}`;
+    }
+    const res = await apiFetch(url);
     if (!res.ok) {
-        console.error("Failed to load tasks", res.status);
+        console.error("Failed to load tasks", res.status, await res.text());
         return;
     }
     const tasks = await res.json();
     renderTasks(tasks);
 }
+
+taskView.addEventListener("change", ()=>{
+    upcomingControl.hidden = taskView.value !== "upcoming";
+    loadTasks();
+});
+
+upcomingDays.addEventListener("change", loadTasks);
 
 async function loadStats() {
     const res = await apiFetch(`${API}/tasks/stats`);
@@ -185,6 +217,11 @@ function renderTasks(tasks) {
        editBtn.addEventListener("click", ()=>startEdit(i));
        actions.appendChild(editBtn);
        
+       const duplicateBtn = document.createElement("button");
+       duplicateBtn.textContent = "Duplicate";
+       duplicateBtn.addEventListener("click",()=>duplicateTask(i.id));
+       actions.appendChild(duplicateBtn);
+
        const delBtn = document.createElement("button");
        delBtn.textContent = "Delete";
        delBtn.addEventListener("click", ()=>deleteTask(i.id));
@@ -198,10 +235,11 @@ function renderTasks(tasks) {
 async function completeTask(id) {
     const res = await apiFetch(`${API}/tasks/${id}/complete`, {method:"PATCH"});
     if (!res.ok) {
-        console.error("Failed to complete task", res.status);
+        console.error("Failed to complete task", res.status, await res.text());
         return;
     }
     loadTasks();
+    loadStats();
 }
 
 async function deleteTask(id) {
@@ -259,6 +297,42 @@ form.addEventListener("submit", async (event)=>{
     resetFrom();
     loadTasks();
 });
+
+async function duplicateTask(id) {
+    const res = await apiFetch(`${API}/task/${id}/duplicate`, {
+        method: "POST",
+    });
+
+    if (!res.ok) {
+        console.error("Failed ot duplicate task", res.status, await res.text());
+        return;
+    }
+    await res.json();
+    loadTasks();
+    loadStats();
+}
+async function clearTasksByStatus() {
+    const status = clearStatus.value;
+
+    if (!confirm(`Delete all ${status} tasks?`)) {
+        return;
+    }
+    const res = await apiFetch(
+        `${API}/tasks?status=${encodeURIComponent(status)}`, { method:"DELETE"}
+    );
+
+    if (!res.ok) {
+        console.error("Failed to clear tasks", res.status, await res.text());
+        return;
+    }
+
+    const result = await res.json();
+    alert(`Deleted ${result.deleted} ${status} tasks(s).`);
+    loadTasks();
+    loadStats();
+}
+
+clearTasksBtn.addEventListener("click", clearTasksByStatus);
 
 document.getElementById("filter-status").addEventListener("change", loadTasks);
 document.getElementById("filter-importance").addEventListener("change", loadTasks);
