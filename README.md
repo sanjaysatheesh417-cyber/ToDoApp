@@ -3,18 +3,18 @@ I have made a typical to-do-app with authentication as one of first completely s
 
 # Features
 After creating an account,
-*you can add your tasks with time and importance
-*delete them
-*delete based on their status
-*view overall status
-*edit the tasks
-*duplicate the tasks
+-you can add your tasks with time and importance
+-delete them
+-delete based on their status
+-view overall status
+-edit the tasks
+-duplicate the tasks
 
 # Stack
-framework - fastapi
-frontend - javascript, html, css
-database - postgresql
-deployment - docker, vercel and neon
+-framework -> fastapi
+-frontend -> javascript, html, css
+-database -> postgresql
+-deployment -> docker, vercel and neon
 
 # How it was made
 I started setting up schemas, models and the settings for the fastapi API, then after creating basic necessary services and routes for adding a task ,etc I realized that unless i add an authorisation users cant manage their own tasks and i cant create session, but creating auth takes time but i did it somehow, after that i added some more features and started building the frontend, i faced some issue with rendering and cors but managed to do it. Then i styled the frontend using css and add a image i downloaded from pinterest!!!!
