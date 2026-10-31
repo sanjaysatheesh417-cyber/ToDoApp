@@ -34,6 +34,22 @@ function setAuthMessage(message) {
     authMessage.textContent = message;
 }
 
+function getApiErrorMessages(detail) {
+    if (typeof detail === "string") {
+        return detail;
+    }
+
+    if (Array.isArray(detail)) {
+        return detail.map((item)=>{
+            const location = Array.isArray(item.loc) ? item.loc[item.loc.length-1]:"";
+            const field = location ? `${location}:`:"";
+            const message = (item.msg || "Invalid value").replace(/^Value error,\s*/i, "");
+            return `${field}${message}`;
+        }).join(" ");
+    }
+    return "Request failed.";
+}
+
 function showTasks() {
     authSection.hidden = true;
     tasksSection.hidden = false;
@@ -80,7 +96,7 @@ authForm.addEventListener("submit", async (event) => {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.detail || "Request failed");
+            throw new Error(getApiErrorMessages(result.detail));
         }
 
         if (isRegistering) {
