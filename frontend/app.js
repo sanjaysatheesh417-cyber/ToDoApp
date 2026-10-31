@@ -39,7 +39,7 @@ function showTasks() {
 async function apiFetch(url, options = {}) {
     const headers = {
         ...options.headers,
-        Authorisation: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
     };
     return fetch(url, {...options, headers});
 }
@@ -83,13 +83,23 @@ authForm.addEventListener("submit", async (event) => {
     }
 });
 
+document.getElementById("toggle-auth").addEventListener("click", ()=>{
+    isRegistering = !isRegistering;
+
+    document.getElementById("auth-title").textContent = 
+    isRegistering ? "Create account" : "sign in";
+
+    document.getElementById("toggle-auth").textContent = isRegistering ? "back to sign in":"create account instead";
+
+    setAuthMessage("");
+})
 function buildQuery() {
     const params = new URLSearchParams({limit:"100"});
     const status = document.getElementById("filter-status").value;
     const importance = document.getElementById("filter-importance").value;
     const search = document.getElementById("search-input").value.trim()
     if (status) {
-        params.set("status".status);
+        params.set("status",status);
     };
     if (importance){
         params.set("importance",importance)
@@ -101,18 +111,17 @@ function buildQuery() {
 }
 
 async function loadTasks() {
-    const res = await fetch(`${API}/tasks`);
+    const res = await apiFetch(`${API}/tasks?${buildQuery()}`);
     if (!res.ok) {
         console.error("Failed to load tasks", res.status);
         return;
     }
     const tasks = await res.json();
     renderTasks(tasks);
-    loadStats();
 }
 
 async function loadStats() {
-    const res = await fetch(`${API}/tasks/stats`);
+    const res = await apiFetch(`${API}/tasks/stats`);
     if (!res.ok) return;
     const s = await res.json();
     document.getElementById("stats").textContent = `Pending: ${s.pending} | Completed: ${s.completed} | Overdue: ${s.overdue}`;
@@ -122,7 +131,7 @@ function renderTasks(tasks) {
     const list = document.getElementById("task-list");
     list.innerHTML = "";
 
-    if (tasks.lenght === 0) {
+    if (tasks.length === 0) {
         const empty = document.createElement("li");
         empty.className="empty";
         empty.textContent = "No tasks found.";
@@ -151,6 +160,7 @@ function renderTasks(tasks) {
        meta.className = "task-meta";
        const imp = document.createElement("span");
        meta.className = `badge badge-${i.importance}`;
+       imp.textContent = i.importance;
 
        const due = document.createElement("span");
        due.className = "due";
@@ -186,7 +196,7 @@ function renderTasks(tasks) {
 };
 
 async function completeTask(id) {
-    const res = await fetch(`${API}/tasks/${id}/complete`, {method:"PATCH"});
+    const res = await apiFetch(`${API}/tasks/${id}/complete`, {method:"PATCH"});
     if (!res.ok) {
         console.error("Failed to complete task", res.status);
         return;
@@ -196,7 +206,7 @@ async function completeTask(id) {
 
 async function deleteTask(id) {
     if (!confirm("Delete this task?")) return;
-    const res = await fetch(`${API}/tasks/${id}`, {method: "DELETE"});
+    const res = await apiFetch(`${API}/tasks/${id}`, {method: "DELETE"});
     if (res.status !== 204) {
         console.error("Failed to delete task", res.status);
         return;
@@ -234,7 +244,7 @@ form.addEventListener("submit", async (event)=>{
 
     const isEdit = editingId !== null;
     const url = isEdit ? `${API}/tasks/${editingId}` : `${API}/tasks`;
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
     method: isEdit ? "PATCH": "POST",
     headers: {"Content-type": "application/json"},
     body: JSON.stringify(body),
@@ -255,8 +265,13 @@ document.getElementById("filter-importance").addEventListener("change", loadTask
 
 let searchTime;
 document.getElementById("search-input").addEventListener("input", ()=>{
-    clearTimeOut(searchTimer);
+    clearTimeout(searchTime);
     searchTime = setTimeout(loadTasks, 300);
 });
 
-loadTasks();
+if (accessToken) {
+    showTasks();
+} else {
+    authSection.hidden = false;
+    tasksSection.hidden = true;
+}
