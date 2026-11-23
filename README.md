@@ -31,3 +31,7 @@ I started setting up schemas, models and the settings for the fastapi API, then 
 # Ai usage declaration
 
 I only used AI to debug, brainstrom ideas, learn and help me with deployment in vercel, it was my first time using vercel so, it took a lot of effort..
+
+# Testing Credentials
+username: testing
+password: Testing#1234
