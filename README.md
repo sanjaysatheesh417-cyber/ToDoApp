@@ -4,19 +4,19 @@ I have made a typical to-do-app with authentication as one of first completely s
 
 # Features
 
-After creating an account,
--you can add your tasks with time and importance
--delete them
--delete based on their status
--view overall status
--edit the tasks
+After creating an account,\
+-you can add your tasks with time and importance\
+-delete them\
+-delete based on their status\
+-view overall status\
+-edit the tasks\
 -duplicate the tasks
 
 # Stack
 
--framework -> fastapi
--frontend -> javascript, html, css
--database -> postgresql
+-framework -> fastapi\
+-frontend -> javascript, html, css\
+-database -> postgresql\
 -deployment -> docker, vercel and neon
 
 # How it was made
